@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Website currently under construction." />
+  <title>Under Construction</title>
+
+  <style>
+    /* Reset and base styles */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { width: 100%; min-height: 100%; }
+    body {
+      font-family: "Avenir Next", Avenir, "Helvetica Neue", Helvetica, Arial, sans-serif;
+      color: #17232d;
+      background: #f3f6f7;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+      overflow-x: hidden;
+    }
+    button, a { font: inherit; }
+    button { border: none; cursor: pointer; }
+    a { color: inherit; text-decoration: none; }
+
+    /* Page layout */
+    .page {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100svh;
+      padding: 32px 24px;
+      overflow: hidden;
+    }
+    /* Subtle ambient background */
+    .page::before {
+      content: "";
+      position: absolute;
+      width: 650px;
+      height: 650px;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      background:
+        radial-gradient(circle at 50% 38%, rgba(104, 132, 148, 0.12) 0%, rgba(104, 132, 148, 0.045) 28%, transparent 65%),
+        radial-gradient(circle at 8% 92%, rgba(255, 255, 255, 0.78) 0%, transparent 38%),
+        linear-gradient(135deg, #f7f8f8 0%, #eef3f5 52%, #f6f7f7 100%);
+      pointer-events: none;
+    }
+    .content {
+      position: relative;
+      z-index: 1;
+      width: min(760px, 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    /* Typography */
+    .eyebrow {
+      margin-bottom: 18px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: #6d7c86;
+    }
+    .title {
+      max-width: 700px;
+      font-size: clamp(2.5rem, 6.5vw, 4.7rem);
+      line-height: 0.96;
+      font-weight: 700;
+      letter-spacing: -0.052em;
+      color: #151b21;
+    }
+    .description {
+      max-width: 510px;
+      margin-top: 22px;
+      font-size: clamp(15px, 1.7vw, 17px);
+      line-height: 1.7;
+      font-weight: 400;
+      letter-spacing: -0.008em;
+      color: #66747e;
+    }
+
+    /* Lottie animation container */
+    .animation-container {
+      width: min(430px, 80vw);
+      height: min(430px, 80vw);
+      margin-top: clamp(22px, 3.5vw, 34px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .animation-container canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* Contact button */
+    .contact-button {
+      margin-top: clamp(12px, 2vw, 22px);
+      min-width: 142px;
+      min-height: 50px;
+      padding: 0 26px;
+      border-radius: 999px;
+      background: #17242d;
+      color: #ffffff;
+      font-size: 15px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.18s ease, background-color 0.18s ease, box-shadow 0.18s ease;
+    }
+    .contact-button:hover {
+      transform: translateY(-2px);
+      background: #263740;
+      box-shadow: 0 8px 24px rgba(24, 35, 44, 0.14);
+    }
+    .contact-button:active {
+      transform: translateY(0);
+    }
+    .contact-button:focus-visible {
+      outline: 3px solid rgba(0, 0, 0, 0.18);
+      outline-offset: 4px;
+    }
+
+    /* Modal overlay */
+    .modal {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: rgba(17, 17, 17, 0.38);
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 220ms ease, visibility 220ms ease;
+    }
+    .modal.active {
+      opacity: 1;
+      visibility: visible;
+    }
+    .modal-panel {
+      position: relative;
+      width: min(410px, 100%);
+      padding: 30px;
+      border-radius: 24px;
+      background: #ffffff;
+      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.18);
+      transform: translateY(18px) scale(0.97);
+      transition: transform 220ms ease;
+    }
+    .modal.active .modal-panel {
+      transform: translateY(0) scale(1);
+    }
+    .modal-heading {
+      padding-right: 42px;
+      font-family: "Avenir Next", Avenir, "Helvetica Neue", Helvetica, Arial, sans-serif;
+      font-size: 24px;
+      line-height: 1.15;
+      font-weight: 700;
+      letter-spacing: -0.035em;
+      color: #182129;
+    }
+    .modal-subtitle {
+      margin-top: 9px;
+      font-family: "Avenir Next", Avenir, "Helvetica Neue", Helvetica, Arial, sans-serif;
+      font-size: 14px;
+      line-height: 1.6;
+      font-weight: 400;
+      letter-spacing: -0.005em;
+      color: #71808a;
+    }
+
+    /* Close button */
+    .close-button {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: #edf1f3;
+      color: #4e5b64;
+      transition: background-color 0.16s ease, color 0.16s ease, transform 0.16s ease;
+    }
+    .close-button:hover {
+      background: #e5eaed;
+      color: #18232c;
+      transform: rotate(4deg);
+    }
+    .close-button:focus-visible {
+      outline: 2px solid #171717;
+      outline-offset: 2px;
+    }
+    .close-button svg {
+      width: 17px;
+      height: 17px;
+    }
+
+    /* Contact option links */
+    .contact-options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 25px;
+    }
+    .contact-option {
+      width: 100%;
+      min-height: 62px;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      border: 1px solid #dfe6ea;
+      border-radius: 15px;
+      background: #ffffff;
+      transition: background-color 0.16s ease, border-color 0.16s ease, transform 0.16s ease;
+    }
+    .contact-option:hover {
+      background: #f7f9fa;
+      border-color: #cfd8dd;
+      transform: translateY(-1px);
+    }
+    .contact-option:active {
+      transform: translateY(0);
+    }
+    .contact-option:focus-visible {
+      outline: 2px solid #171717;
+      outline-offset: 2px;
+    }
+    .option-icon {
+      flex: 0 0 auto;
+      width: 42px;
+      height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+      background: #edf1f3;
+      color: #26343d;
+    }
+    .option-icon svg {
+      width: 20px;
+      height: 20px;
+    }
+    .option-content {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .option-title {
+      font-family: "Avenir Next", Avenir, "Helvetica Neue", Helvetica, Arial, sans-serif;
+      font-size: 15px;
+      line-height: 1.2;
+      font-weight: 650;
+      letter-spacing: -0.012em;
+      color: #1b2730;
+    }
+    .option-description {
+      font-family: "Avenir Next", Avenir, "Helvetica Neue", Helvetica, Arial, sans-serif;
+      font-size: 12px;
+      line-height: 1.35;
+      font-weight: 400;
+      letter-spacing: 0;
+      color: #7a8790;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 600px) {
+      .page {
+        padding: 28px 18px max(28px, env(safe-area-inset-bottom));
+      }
+      .eyebrow {
+        margin-bottom: 14px;
+        font-size: 10px;
+        letter-spacing: 0.14em;
+      }
+      .title {
+        max-width: 360px;
+        font-size: clamp(2.25rem, 12vw, 3.3rem);
+        letter-spacing: -0.05em;
+      }
+      .description {
+        max-width: 350px;
+        margin-top: 18px;
+        font-size: 14px;
+        line-height: 1.55;
+      }
+      .animation-container {
+        width: min(340px, 82vw);
+        margin-top: 22px;
+      }
+      .contact-button {
+        margin-top: 8px;
+        min-width: 138px;
+        min-height: 48px;
+        font-size: 14px;
+      }
+      .modal {
+        padding: 16px;
+      }
+      .modal-panel {
+        padding: 26px 20px 20px;
+        border-radius: 21px;
+      }
+      .modal-heading {
+        font-size: 22px;
+      }
+      .contact-options {
+        margin-top: 22px;
+      }
+      .contact-option {
+        min-height: 60px;
+      }
+    }
+    @media (max-width: 600px) and (max-height: 700px) {
+      .page {
+        padding-top: 20px;
+        padding-bottom: 20px;
+      }
+      .animation-container {
+        width: min(280px, 68vw);
+        margin-top: 15px;
+      }
+      .description {
+        margin-top: 13px;
+      }
+      .contact-button {
+        margin-top: 4px;
+      }
+    }
+
+    /* Reduce motion preference */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <main class="page">
+    <section class="content" aria-labelledby="page-title">
+
+      <div class="eyebrow">
+        Coming Soon
+      </div>
+
+      <h1 class="title" id="page-title">
+        Under Construction
+      </h1>
+
+      <p class="description">
+        We’re putting the finishing touches together. The website will be available soon.
+      </p>
+
+      <!-- Lottie animation iframe -->
+      <div class="animation-container" aria-label="Construction animation">
+        <canvas id="construction-animation"></canvas>
+      </div>
+
+      <button
+        class="contact-button"
+        id="contactButton"
+        type="button"
+        aria-haspopup="dialog"
+        aria-controls="contactModal"
+      >
+        Contact
+      </button>
+
+    </section>
+  </main>
+
+  <!-- Contact Modal -->
+  <div
+    class="modal"
+    id="contactModal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="contactTitle"
+    aria-hidden="true"
+  >
+
+    <div class="modal-panel">
+
+      <button
+        class="close-button"
+        id="closeModal"
+        type="button"
+        aria-label="Close contact window"
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+          <path d="M6 6L18 18"></path>
+          <path d="M18 6L6 18"></path>
+        </svg>
+      </button>
+
+      <h2 class="modal-heading" id="contactTitle">
+        GET IN TOUCH
+      </h2>
+
+      <p class="modal-subtitle">
+        Choose your preferred way to contact.
+      </p>
+
+      <div class="contact-options">
+
+        <!-- WhatsApp/Phone -->
+        <a
+          class="contact-option"
+          href="https://wa.me/917010709836"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Contact on WhatsApp"
+        >
+          <span class="option-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20.5 11.5a8.5 8.5 0 0 1-12.6 7.4L4 20l1.1-3.7A8.5 8.5 0 1 1 20.5 11.5Z" />
+              <path d="M8.7 8.5c.2-.4.4-.4.7-.4h.5c.2 0 .4.1.5.4l.7 1.6c.1.2.1.4 0 .6l-.5.6c.5 1 1.3 1.8 2.3 2.3l.6-.5c.2-.1.4-.1.6 0l1.6.7c.3.1.4.3.4.5v.5c0 .3 0 .5-.4.7-.4.2-1 .3-1.4.2-1.1-.2-2.3-.8-3.4-1.7-1-.8-1.8-1.8-2.3-2.9-.4-.9-.6-1.8-.4-2.6Z" />
+            </svg>
+          </span>
+          <span class="option-content">
+            <span class="option-title">WhatsApp / Phone</span>
+            <span class="option-description">Message on WhatsApp</span>
+          </span>
+        </a>
+
+        <!-- Phone Call -->
+        <a
+          class="contact-option"
+          href="tel:+917010709836"
+          aria-label="Call by phone"
+        >
+          <span class="option-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.8.7 2.6a2 2 0 0 1-.5 2.1L8 9.7a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.5c.8.4 1.7.6 2.6.7A2 2 0 0 1 22 16.9Z"></path>
+            </svg>
+          </span>
+          <span class="option-content">
+            <span class="option-title">Call</span>
+            <span class="option-description">Call directly by phone</span>
+          </span>
+        </a>
+
+        <!-- Email -->
+        <a
+          class="contact-option"
+          href="mailto:user.dharshan@gmail.com"
+          aria-label="Send an email"
+        >
+          <span class="option-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="5" width="18" height="14" rx="2" />
+              <path d="M3 7l9 6 9-6"></path>
+            </svg>
+          </span>
+          <span class="option-content">
+            <span class="option-title">Email</span>
+            <span class="option-description">Send an email</span>
+          </span>
+        </a>
+
+      </div>
+
+    </div>
+  </div>
+
+  <script type="module">
+    import { DotLottie } from "https://cdn.jsdelivr.net/npm/@lottiefiles/dotlottie-web/+esm";
+
+    const canvas = document.getElementById("construction-animation");
+
+    new DotLottie({
+      autoplay: true,
+      loop: true,
+      canvas,
+      src: "https://lottie.host/bde1da89-fec1-4d0e-9f20-2ad2688d2f73/ggwjFXgLEg.lottie"
+    });
+  </script>
+
+  <script>
+    const contactButton = document.getElementById("contactButton");
+    const contactModal = document.getElementById("contactModal");
+    const closeModal = document.getElementById("closeModal");
+    let lastFocusedElement = null;
+
+    function openModal() {
+      lastFocusedElement = document.activeElement;
+      contactModal.classList.add("active");
+      contactModal.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden"; // prevent background scrolling
+      closeModal.focus(); // focus the close button
+    }
+
+    function hideModal() {
+      contactModal.classList.remove("active");
+      contactModal.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+      if (lastFocusedElement) lastFocusedElement.focus();
+    }
+
+    contactButton.addEventListener("click", openModal);
+    closeModal.addEventListener("click", hideModal);
+    contactModal.addEventListener("click", function(event) {
+      if (event.target === contactModal) {
+        hideModal();
+      }
+    });
+    document.addEventListener("keydown", function(event) {
+      if (event.key === "Escape" && contactModal.classList.contains("active")) {
+        hideModal();
+      }
+    });
+  </script>
+
+</body>
+</html>
